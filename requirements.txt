@@ -1,0 +1,6 @@
+requests
+schedule
+tweepy
+pandas
+matplotlib
+pytz
