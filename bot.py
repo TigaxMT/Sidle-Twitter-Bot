@@ -11,7 +11,11 @@ import os
 import pandas as pd
 import matplotlib.pyplot as plt
 
+# Unicode Emojis
 uni_emojis = {"skull": u"\U0001F480", "check": u"\U00002705", "up":"\U00002197\U0000FE0F", "pct": "\U0001F523"}
+
+# Read the CSV where the countries data is save
+df = pd.read_csv("countries.csv")
 
 def trendingHashtags(api, countryCode):
 	# verify if the country has a covid hashtag trending to use
@@ -41,8 +45,7 @@ def stringToDate(date):
 	return new_date.strftime("%b %d")
 
 def finalTweet(api, timeline, msg, country):
-	# Tweet our output message + image graph
-
+	
 	total_confirmed = []
 
 	for i in range(len(timeline)):
@@ -119,51 +122,16 @@ General:
 		return output, timeline
 
 def covid(api, country):
-	# Create the output and call the finalTweet func
-	# for the specified country
 
-	if country == "pt":
-		pt = u"\U0001F1F5\U0001F1F9"
-		out, timeline = makeReq(api, "pt", "Europe/Lisbon")
-		pt += out
-		finalTweet(api, timeline, pt, "Portugal")
+	country_df = df[ df["Country_Code"]==country ]
 
-	elif country == "br":
-		br = u"\U0001F1E7\U0001F1F7"
-		out, timeline = makeReq(api, "br", "America/Sao_Paulo")
-		br += out
-		finalTweet(api, timeline, br, "Brazil")
+	ctr = country_df["Unicode_Emoji"].iloc[0]
+	ctr = ctr.encode().decode("unicode-escape")
 
-	elif country == "us":
-		us = u"\U0001F1FA\U0001F1F8"
-		out, timeline = makeReq(api, "us", "America/New_York")
-		us += out
-		finalTweet(api, timeline, us, "USA")
-
-	elif country == "it":
-		it = u"\U0001F1EE\U0001F1F9"
-		out, timeline = makeReq(api, "it", "Europe/Rome")
-		it += out
-		finalTweet(api, timeline, it, "Italy")
-
-	elif country == "es":
-		es = u"\U0001F1EA\U0001F1F8"
-		out, timeline = makeReq(api, "es", "Europe/Madrid")
-		es += out
-		finalTweet(api, timeline, es, "Spain")
-
-	elif country == "fr":
-		fr = u"\U0001F1EB\U0001F1F7"
-		out, timeline = makeReq(api, "fr", "Europe/Paris")
-		fr += out
-		finalTweet(api, timeline, fr, "France")
-
-	elif country == "de":
-		de = u"\U0001F1E9\U0001F1EA"
-		out, timeline = makeReq(api, "de", "Europe/Berlin")
-		de += out
-		finalTweet(api, timeline, de, "Germany")
-
+	out, timeline = makeReq(api, country, country_df["Timezone"].iloc[0])
+	ctr += out
+	finalTweet(api, timeline, ctr, country_df["Country_Name"].iloc[0])
+	print("Sent")
 	return
 
 
@@ -183,7 +151,6 @@ def main():
 		print("Error in main()", e)
 		sys.exit(1)
 
-	# Schedule to run everyday, in Europe/Lisbon timezone 
 	schedule.every().day.at("20:45").do(threaded_job, covid, api, "fr")#fr, Paris
 	schedule.every().day.at("20:30").do(threaded_job, covid, api, "de")#de, Berlin
 	schedule.every().day.at("20:15").do(threaded_job, covid, api, "it")#it, Rome
@@ -195,7 +162,7 @@ def main():
 	while True:
 		schedule.run_pending()
 
-		# For performance measures
+		# Performance Measure
 		time.sleep(60)
 
 if __name__ == '__main__':
