@@ -1,6 +1,5 @@
 from tweepy import OAuthHandler, API
 from datetime import datetime
-import pytz
 import schedule
 import time
 import threading
@@ -98,14 +97,13 @@ def makeReq(api, country, tz):
 		# if it has a covid trending to use
 		hashtag = trendingHashtags(api, country)
 
-		timezone = pytz.timezone(tz)
 		timeline = data["data"]["timeline"]
 		data_date = data["data"]["updated_at"]
 		data_today = data["data"]["today"]
 		data = data["data"]["latest_data"]
 
 		output = f'''
-					\nToday({datetime.now(timezone).strftime("%I%p")}, {tz.split("/")[1]}):
+					\n{datetime.strptime(timeline[0]['date'],"%Y-%m-%d").strftime("%d %b")}:
 {uni_emojis["skull"]} {data_today["deaths"]} deaths
 {uni_emojis["check"]} {data_today["confirmed"]} confirmed cases
 
@@ -171,7 +169,7 @@ def main():
 		schedule.every().day.at("19:00").do(threaded_job, covid, api, "es")#es, Madrid +1
 		schedule.every().day.at("20:00").do(threaded_job, covid, api, "pt")#pt, Lisbon +0
 		schedule.every().day.at("20:15").do(threaded_job, covid, api, "gb")#gb, UK +0
-		schedule.every().day.at("00:00").do(threaded_job, covid, api, "br")#br, Brasilia -4
+		schedule.every().day.at("00:10").do(threaded_job, covid, api, "br")#br, Brasilia -4
 		schedule.every().day.at("02:00").do(threaded_job, covid, api, "co")#co, Bogota -6
 
 	# Schedule only on odd days
@@ -181,7 +179,7 @@ def main():
 		schedule.every().day.at("19:00").do(threaded_job, covid, api, "fr")#fr, Paris +1
 		schedule.every().day.at("19:15").do(threaded_job, covid, api, "it")#it, Rome +1
 		schedule.every().day.at("20:00").do(threaded_job, covid, api, "gb")#gb, UK +0
-		schedule.every().day.at("00:00").do(threaded_job, covid, api, "br")#br, Brasilia -4
+		schedule.every().day.at("00:10").do(threaded_job, covid, api, "br")#br, Brasilia -4
 		schedule.every().day.at("01:00").do(threaded_job, covid, api, "ca")#ca, Ottawa -5
 
 

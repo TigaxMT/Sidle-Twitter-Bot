@@ -3,4 +3,3 @@ schedule
 tweepy
 pandas
 matplotlib
-pytz
