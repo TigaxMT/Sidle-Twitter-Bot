@@ -156,40 +156,40 @@ def main():
 
 	# Schedule only on even days
 	if day % 2 == 0:
-		schedule.every().day.at("20:00").do(threaded_job, covid, api, "pt")#pt, Lisbon
-		schedule.every().day.at("20:15").do(threaded_job, covid, api, "it")#it, Rome
-		schedule.every().day.at("20:30").do(threaded_job, covid, api, "de")#de, Berlin
-		schedule.every().day.at("20:45").do(threaded_job, covid, api, "fr")#fr, Paris
-		schedule.every().day.at("21:00").do(threaded_job, covid, api, "es")#es, Madrid
-		schedule.every().day.at("21:15").do(threaded_job, covid, api, "br")#br, Brasilia
-		schedule.every().day.at("22:00").do(threaded_job, covid, api, "us")#us, New York
+		schedule.every().day.at("12:00").do(threaded_job, covid, api, "jp")#jp, Tokyo +8
+		schedule.every().day.at("18:00").do(threaded_job, covid, api, "ru")#ru, Moscow +2
+		schedule.every().day.at("19:00").do(threaded_job, covid, api, "es")#es, Madrid +1
+		schedule.every().day.at("19:15").do(threaded_job, covid, api, "de")#de, Berlin +1
+		schedule.every().day.at("20:00").do(threaded_job, covid, api, "pt")#pt, Lisbon +0
+		schedule.every().day.at("01:00").do(threaded_job, covid, api, "us")#us, New York -5
+		schedule.every().day.at("02:00").do(threaded_job, covid, api, "co")#co, Bogota -6
 
 	# Schedule only on 31st days 
 	elif day == 31:
-		schedule.every().day.at("20:00").do(threaded_job, covid, api, "pt")#pt, Lisbon
-		schedule.every().day.at("20:15").do(threaded_job, covid, api, "gb")#gb, UK
-		schedule.every().day.at("20:30").do(threaded_job, covid, api, "co")#co, Bogota
-		schedule.every().day.at("20:45").do(threaded_job, covid, api, "ru")#ru, Moscow
-		schedule.every().day.at("21:00").do(threaded_job, covid, api, "es")#es, Madrid
-		schedule.every().day.at("21:15").do(threaded_job, covid, api, "br")#br, Brasilia
-		schedule.every().day.at("22:00").do(threaded_job, covid, api, "au")#au, Sydney
+		schedule.every().day.at("11:00").do(threaded_job, covid, api, "au")#au, Sydney +9
+		schedule.every().day.at("18:00").do(threaded_job, covid, api, "ru")#ru, Moscow +2
+		schedule.every().day.at("19:00").do(threaded_job, covid, api, "es")#es, Madrid +1
+		schedule.every().day.at("20:00").do(threaded_job, covid, api, "pt")#pt, Lisbon +0
+		schedule.every().day.at("20:15").do(threaded_job, covid, api, "gb")#gb, UK +0
+		schedule.every().day.at("00:00").do(threaded_job, covid, api, "br")#br, Brasilia -4
+		schedule.every().day.at("02:00").do(threaded_job, covid, api, "co")#co, Bogota -6
 
 	# Schedule only on odd days
 	else:
-		schedule.every().day.at("20:00").do(threaded_job, covid, api, "co")#co, Bogota
-		schedule.every().day.at("20:15").do(threaded_job, covid, api, "ca")#ca, Ottawa
-		schedule.every().day.at("20:30").do(threaded_job, covid, api, "gb")#gb, UK
-		schedule.every().day.at("20:45").do(threaded_job, covid, api, "ru")#ru, Moscow
-		schedule.every().day.at("21:00").do(threaded_job, covid, api, "cn")#cn, Hong Kong
-		schedule.every().day.at("21:15").do(threaded_job, covid, api, "jp")#jp, Tokyo
-		schedule.every().day.at("22:00").do(threaded_job, covid, api, "au")#au, Sydney
+		schedule.every().day.at("11:00").do(threaded_job, covid, api, "au")#au, Sydney +9
+		schedule.every().day.at("13:00").do(threaded_job, covid, api, "cn")#cn, Hong Kong +7
+		schedule.every().day.at("19:00").do(threaded_job, covid, api, "fr")#fr, Paris +1
+		schedule.every().day.at("19:15").do(threaded_job, covid, api, "it")#it, Rome +1
+		schedule.every().day.at("20:00").do(threaded_job, covid, api, "gb")#gb, UK +0
+		schedule.every().day.at("00:00").do(threaded_job, covid, api, "br")#br, Brasilia -4
+		schedule.every().day.at("01:00").do(threaded_job, covid, api, "ca")#ca, Ottawa -5
 
 
 	while True:
 		schedule.run_pending()
 
 		# Performance Measure
-		time.sleep(10)
+		time.sleep(60)
 
 if __name__ == '__main__':
     main()
