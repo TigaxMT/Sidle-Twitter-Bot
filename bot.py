@@ -63,7 +63,7 @@ def makeReq(api, country, tz):
 	# First verify if we have a custom API for the country
 	# we do that looping through the list and verify if any
 	# function name has the country code
-	if not country in [key for key, value in countries_dict.items()]:
+	if country in [key for key, value in countries_dict.items()]:
 
 		timeline, today, general = countries_dict[country]()
 
@@ -119,8 +119,6 @@ def covid(api, country):
 
 	# Add the graph image and tweet all the stuff
 	finalTweet(api, timeline, ctr, country_df["Country_Name"].iloc[0])
-	
-	print("DONE")
 
 	return
 
