@@ -1,5 +1,7 @@
+from utils import stringToDate, trendingHashtags, genTextOutput
+from countries import countries_dict, pt_req
 from tweepy import OAuthHandler, API
-from datetime import datetime
+import datetime
 import schedule
 import time
 import threading
@@ -8,40 +10,13 @@ import requests
 import json
 import os
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 
-# Unicode Emojis
-uni_emojis = {"skull": u"\U0001F480", "check": u"\U00002705", "up":"\U00002197\U0000FE0F", "pct": "\U0001F523"}
 
 # Read the CSV where the countries data is save
 df = pd.read_csv("countries.csv")
-
-def trendingHashtags(api, countryCode):
-	# verify if the country has a covid hashtag trending to use
-
-	trends_av = api.trends_available()
-	found_hashtag = False
-	hashtag = "#COVID19"
-
-	for trend in trends_av:
-		if trend["countryCode"] == countryCode.upper():
-			trends = api.trends_place(trend["woeid"])[0]["trends"]
-			trend_names = [ trend["name"] for trend in trends if "#covid" in trend["name"].lower() ]
-			
-			if len(trend_names) > 0:
-				found_hashtag = True
-				break
-	
-	if found_hashtag:
-		hashtag = trend_names[0]
-
-	return hashtag
-
-def stringToDate(date):
-	# Convert full date string to a abreviaton of Date
-	new_date = datetime.strptime(date, "%Y-%m-%d")
-
-	return new_date.strftime("%b %d")
 
 def finalTweet(api, timeline, msg, country):
 	
@@ -60,16 +35,17 @@ def finalTweet(api, timeline, msg, country):
 	total_confirmed.columns = ["Date", "Confirmed Cases", "Deaths", "Active Cases"]
 	total_confirmed["Date"] = total_confirmed["Date"].apply(stringToDate)
 
+
 	# Graphing
 	fig, ax = plt.subplots(figsize=(16,10))
+	fig.gca().xaxis.set_major_formatter(mdates.DateFormatter("%B"))
+	fig.gca().xaxis.set_major_locator(mdates.MonthLocator())
 	ax.plot("Date", "Confirmed Cases", data=total_confirmed, label="Confirmed Cases")
 	ax.plot("Date", "Deaths", data=total_confirmed, label="Deaths")
 	ax.plot("Date", "Active Cases", data=total_confirmed, label="Active Cases")
 
-
-	ax.set_xlim(total_confirmed["Date"].loc[0], total_confirmed["Date"].loc[len(total_confirmed["Date"])-1])
 	ax.grid(True)
-
+	
 	fig.autofmt_xdate()
 	plt.xlabel("Date")
 	plt.ylabel("Number of People")
@@ -82,58 +58,76 @@ def finalTweet(api, timeline, msg, country):
 
 
 def makeReq(api, country, tz):
-	# Make the request
-	url = "https://corona-api.com/countries/%s" % country
-	r = requests.get(url=url)
+	""" Make the request to the API"""
 
-	data = r.json()
-		
-	# Verify if exists the country
-	if "message" in data.keys():
-		pass
+	# First verify if we have a custom API for the country
+	# we do that looping through the list and verify if any
+	# function name has the country code
+	if not country in [key for key, value in countries_dict.items()]:
 
-	else:
-		# Check the trends of the country and verify
-		# if it has a covid trending to use
-		hashtag = trendingHashtags(api, country)
+		timeline, today, general = countries_dict[country]()
 
-		timeline = data["data"]["timeline"]
-		data_date = data["data"]["updated_at"]
-		data_today = data["data"]["today"]
-		data = data["data"]["latest_data"]
+		data_dict = {
+			"data_today": today,
+			"general": general
+		}
 
-		output = f'''
-					\n{datetime.strptime(timeline[0]['date'],"%Y-%m-%d").strftime("%d %b")}:
-{uni_emojis["skull"]} {data_today["deaths"]} deaths
-{uni_emojis["check"]} {data_today["confirmed"]} confirmed cases
-
-General:
-{uni_emojis["skull"]} {data["deaths"]} deaths
-{uni_emojis["check"]} {data["confirmed"]} confirmed cases
-{uni_emojis["up"]} {data["recovered"]} recovered cases
-{uni_emojis["pct"]} {round(data["calculated"]["death_rate"],2)}% of death ratio
-{uni_emojis["pct"]} {round(data["calculated"]["recovery_rate"],2)} of recovery ratio
-{uni_emojis["pct"]} {data["calculated"]["cases_per_million_population"]} cases per million
-
-{hashtag}'''
+		output = genTextOutput(api, data_dict, country)
 
 		return output, timeline
 
-def covid(api, country):
+	else:
+		# Else just use the common API
+		url = "https://corona-api.com/countries/%s" % country
+		r = requests.get(url=url)
+		data = r.json()
+			
+		# Verify if exists the country
+		if "message" in data.keys():
+			return None, None
 
+		else:
+			timeline = data["data"]["timeline"]
+			#data_date = data["data"]["updated_at"]
+			data_today = data["data"]["today"]
+			data = data["data"]["latest_data"]
+
+			data_dict = {
+				"data_today": data_today,
+				"general": data
+			}
+
+			output = genTextOutput(api, data_dict, country)
+
+			return output, timeline
+
+def covid(api, country):
+	""" Call the apis and create the final tweet"""
+
+	# Took the sample where the country code is
 	country_df = df[ df["Country_Code"]==country ]
 
+
+	# Create the country flag emoji
 	ctr = country_df["Unicode_Emoji"].iloc[0]
 	ctr = ctr.encode().decode("unicode-escape")
 
+
+	# Get all the data from the API and create the tweet text
 	out, timeline = makeReq(api, country, country_df["Timezone"].iloc[0])
 	ctr += out
+
+	# Add the graph image and tweet all the stuff
 	finalTweet(api, timeline, ctr, country_df["Country_Name"].iloc[0])
 	
+	print("DONE")
+
 	return
 
 
 def threaded_job(job, api, country):
+	""" Thread the covid() function"""
+
 	job_th = threading.Thread(target=job, args=(api, country))
 	job_th.start()
 
@@ -150,8 +144,8 @@ def main():
 		sys.exit(1)
 
 
-	day = datetime.now().day
-
+	day = datetime.datetime.now().day
+	
 	# Schedule only on even days
 	if day % 2 == 0:
 		schedule.every().day.at("12:00").do(threaded_job, covid, api, "jp")#jp, Tokyo +8
@@ -181,7 +175,6 @@ def main():
 		schedule.every().day.at("20:00").do(threaded_job, covid, api, "gb")#gb, UK +0
 		schedule.every().day.at("00:10").do(threaded_job, covid, api, "br")#br, Brasilia -4
 		schedule.every().day.at("01:00").do(threaded_job, covid, api, "ca")#ca, Ottawa -5
-
 
 	while True:
 		schedule.run_pending()

@@ -2,4 +2,5 @@ requests
 schedule
 tweepy
 pandas
+numpy
 matplotlib
