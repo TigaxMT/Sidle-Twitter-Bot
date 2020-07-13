@@ -76,7 +76,11 @@ def makeReq(api, country, tz):
 
 		return output, timeline
 
-	else:
+	# The code above uses an API with wrong values
+	# For now is commented, probably, in the future will be deleted
+
+
+	"""else:
 		# Else just use the common API
 		url = "https://corona-api.com/countries/%s" % country
 		r = requests.get(url=url)
@@ -99,7 +103,9 @@ def makeReq(api, country, tz):
 
 			output = genTextOutput(api, data_dict, country)
 
-			return output, timeline
+			return output, timeline"""
+
+			
 
 def covid(api, country):
 	""" Call the apis and create the final tweet"""
@@ -144,35 +150,42 @@ def main():
 
 	day = datetime.datetime.now().day
 	
+
+
+	"""
+		The reason that many of the schedules are commented on, 
+		is because they don't have a specific API for the country, yet.
+	"""
+
 	# Schedule only on even days
 	if day % 2 == 0:
-		schedule.every().day.at("12:00").do(threaded_job, covid, api, "jp")#jp, Tokyo +8
-		schedule.every().day.at("18:00").do(threaded_job, covid, api, "ru")#ru, Moscow +2
-		schedule.every().day.at("19:00").do(threaded_job, covid, api, "es")#es, Madrid +1
-		schedule.every().day.at("19:15").do(threaded_job, covid, api, "de")#de, Berlin +1
+		#schedule.every().day.at("12:00").do(threaded_job, covid, api, "jp")#jp, Tokyo +8
+		#schedule.every().day.at("18:00").do(threaded_job, covid, api, "ru")#ru, Moscow +2
+		#schedule.every().day.at("19:00").do(threaded_job, covid, api, "es")#es, Madrid +1
+		#schedule.every().day.at("19:15").do(threaded_job, covid, api, "de")#de, Berlin +1
 		schedule.every().day.at("20:00").do(threaded_job, covid, api, "pt")#pt, Lisbon +0
-		schedule.every().day.at("01:00").do(threaded_job, covid, api, "us")#us, New York -5
-		schedule.every().day.at("02:00").do(threaded_job, covid, api, "co")#co, Bogota -6
+		#schedule.every().day.at("01:00").do(threaded_job, covid, api, "us")#us, New York -5
+		#schedule.every().day.at("02:00").do(threaded_job, covid, api, "co")#co, Bogota -6
 
 	# Schedule only on 31st days 
 	elif day == 31:
-		schedule.every().day.at("11:00").do(threaded_job, covid, api, "au")#au, Sydney +9
-		schedule.every().day.at("18:00").do(threaded_job, covid, api, "ru")#ru, Moscow +2
-		schedule.every().day.at("19:00").do(threaded_job, covid, api, "es")#es, Madrid +1
+		#schedule.every().day.at("11:00").do(threaded_job, covid, api, "au")#au, Sydney +9
+		#schedule.every().day.at("18:00").do(threaded_job, covid, api, "ru")#ru, Moscow +2
+		#schedule.every().day.at("19:00").do(threaded_job, covid, api, "es")#es, Madrid +1
 		schedule.every().day.at("20:00").do(threaded_job, covid, api, "pt")#pt, Lisbon +0
-		schedule.every().day.at("20:15").do(threaded_job, covid, api, "gb")#gb, UK +0
-		schedule.every().day.at("00:10").do(threaded_job, covid, api, "br")#br, Brasilia -4
-		schedule.every().day.at("02:00").do(threaded_job, covid, api, "co")#co, Bogota -6
+		#schedule.every().day.at("20:15").do(threaded_job, covid, api, "gb")#gb, UK +0
+		#schedule.every().day.at("00:10").do(threaded_job, covid, api, "br")#br, Brasilia -4
+		#schedule.every().day.at("02:00").do(threaded_job, covid, api, "co")#co, Bogota -6
 
 	# Schedule only on odd days
 	else:
-		schedule.every().day.at("11:00").do(threaded_job, covid, api, "au")#au, Sydney +9
-		schedule.every().day.at("13:00").do(threaded_job, covid, api, "cn")#cn, Hong Kong +7
-		schedule.every().day.at("19:00").do(threaded_job, covid, api, "fr")#fr, Paris +1
-		schedule.every().day.at("19:15").do(threaded_job, covid, api, "it")#it, Rome +1
-		schedule.every().day.at("20:00").do(threaded_job, covid, api, "gb")#gb, UK +0
-		schedule.every().day.at("00:10").do(threaded_job, covid, api, "br")#br, Brasilia -4
-		schedule.every().day.at("01:00").do(threaded_job, covid, api, "ca")#ca, Ottawa -5
+		#schedule.every().day.at("11:00").do(threaded_job, covid, api, "au")#au, Sydney +9
+		#schedule.every().day.at("13:00").do(threaded_job, covid, api, "cn")#cn, Hong Kong +7
+		#schedule.every().day.at("19:00").do(threaded_job, covid, api, "fr")#fr, Paris +1
+		#schedule.every().day.at("19:15").do(threaded_job, covid, api, "it")#it, Rome +1
+		#schedule.every().day.at("20:00").do(threaded_job, covid, api, "gb")#gb, UK +0
+		#schedule.every().day.at("00:10").do(threaded_job, covid, api, "br")#br, Brasilia -4
+		#schedule.every().day.at("01:00").do(threaded_job, covid, api, "ca")#ca, Ottawa -5
 
 	while True:
 		schedule.run_pending()
