@@ -4,6 +4,7 @@ from tweepy import OAuthHandler, API
 import datetime
 import schedule
 import time
+import locale
 import threading
 import sys
 import requests
@@ -23,6 +24,11 @@ try:
 
 except:
 	pass
+
+
+# Define the language for the months on matplotlib
+# x-ticks
+locale.setlocale(locale.LC_ALL,'en_GB.utf8')
 
 # Read the CSV where the countries data is save
 df = pd.read_csv("countries.csv")
@@ -188,6 +194,7 @@ def main():
 
 	# Schedule only on odd days
 	else:
+		pass
 		#schedule.every().day.at("11:00").do(threaded_job, covid, api, "au")#au, Sydney +9
 		#schedule.every().day.at("13:00").do(threaded_job, covid, api, "cn")#cn, Hong Kong +7
 		#schedule.every().day.at("19:00").do(threaded_job, covid, api, "fr")#fr, Paris +1
@@ -195,7 +202,7 @@ def main():
 		#schedule.every().day.at("20:00").do(threaded_job, covid, api, "gb")#gb, UK +0
 		#schedule.every().day.at("00:10").do(threaded_job, covid, api, "br")#br, Brasilia -4
 		#schedule.every().day.at("01:00").do(threaded_job, covid, api, "ca")#ca, Ottawa -5
-
+	
 	while True:
 		schedule.run_pending()
 
