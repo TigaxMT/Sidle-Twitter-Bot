@@ -1,4 +1,4 @@
-from utils import stringToDate, trendingHashtags, genTextOutput
+from utils import stringToDate, genTextOutput
 from countries import countries_dict, pt_req
 from tweepy import OAuthHandler, API
 import datetime
@@ -10,10 +10,19 @@ import requests
 import json
 import os
 import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
+# In case of using a development environment
+# it will load the keys/tokens from the .env
+# for that work you need to install python-dotenv
+# and import it. On production it'll just pass
+try:
+	from dotenv import load_dotenv
+	load_dotenv()
+
+except:
+	pass
 
 # Read the CSV where the countries data is save
 df = pd.read_csv("countries.csv")

@@ -31,21 +31,24 @@ def genTextOutput(api, data_dict, country):
 	""" Get a data dict with a certain pattern
 		to fill on the formatted output
 	"""
+
+
+
+	
+
+	""" Hashtag not available for now
+	
 	# Check the trends of the country and verify
 	# if it has a covid trending to use
 	hashtag = trendingHashtags(api, country)
 
-	output = f'''
-					\nToday:
-{uni_emojis["skull"]} {data_dict["data_today"]["deaths"]} deaths
-{uni_emojis["check"]} {data_dict["data_today"]["confirmed"]} confirmed cases
+	"""
 
+	output = f'''
 General:
 {uni_emojis["skull"]} {data_dict["general"]["deaths"]} deaths
 {uni_emojis["check"]} {data_dict["general"]["confirmed"]} confirmed cases
-{uni_emojis["up"]} {data_dict["general"]["recovered"]} recovered cases
-
-{hashtag}'''
+{uni_emojis["up"]} {data_dict["general"]["recovered"]} recovered cases'''
 
 	return output
 
@@ -56,7 +59,7 @@ def stringToDate(date, fmt="%Y-%m-%d"):
 	return new_date.date()
 
 def convertDate(date, fmt):
-	""" Convert Date fromat for the format used on the finalTweet"""
+	""" Convert Date format for the format used on the finalTweet"""
 	new_date = datetime.strptime(date, fmt)
 	new_date = new_date.strftime("%Y-%m-%d")
 
